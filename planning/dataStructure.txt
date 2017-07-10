@@ -1,0 +1,25 @@
+Models
+- User_id
+   - username (unique)
+   - email (unique)
+   - phone_number (unique)
+   - password
+   - active [0,1]
+- Song_id
+   - user_id
+   - artist_id
+      - name (unique)
+      - verified [0,1]
+      - active [0,1]
+   - name
+   - size
+   - time
+   - genre_id
+      - name (unique)
+      - active [0,1]
+   - release_date
+   - album_id (null)
+      - user_id
+      - name
+      - active [0,1]
+      
