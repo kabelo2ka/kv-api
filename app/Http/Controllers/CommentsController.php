@@ -14,7 +14,7 @@ class CommentsController extends Controller
      */
     public function index()
     {
-        $comments = Comment::all();
+        $comments = Comment::orderByDesc('created_at')->get();
         return response()->json(['data' => $comments], 200);
     }
 
