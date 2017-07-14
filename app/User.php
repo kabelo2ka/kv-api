@@ -60,6 +60,11 @@ class User extends Authenticatable
 
     }
 
+    public function getArtistNameAttribute($value)
+    {
+        return $value ?: $this->username;
+    }
+
 
     /**
      * Scope by artist
