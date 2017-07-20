@@ -33,6 +33,6 @@ class UserPlayedSong implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('songs-channel');
+        return new Channel('songs');
     }
 }

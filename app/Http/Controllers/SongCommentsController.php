@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserCommented;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Auth;
@@ -40,12 +41,13 @@ class SongCommentsController extends Controller
      */
     public function store(Request $request, $song)
     {
-       // dd(Auth::id());
         $comment = new Comment();
         $comment->user_id = Auth::id();
         $comment->song_id = $song;
         $comment->body = $request->get('body');
         $comment->save();
+        //event(new UserCommented($comment));
+        broadcast(new UserCommented($comment))->toOthers();
         return response()->json(['data'=>'success'], 200);
     }
 

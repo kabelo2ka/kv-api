@@ -6,7 +6,7 @@ var Redis = require('ioredis');
 
 var redis = new Redis();
 
-redis.subscribe('songs-channel');
+redis.subscribe('songs');
 
 redis.on('message', function (channel, message) {
     console.log(message);
