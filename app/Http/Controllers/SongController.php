@@ -6,7 +6,6 @@ use App\Events\UserPlayedSong;
 use App\Models\Song;
 use Auth;
 use File;
-use Froiden\RestAPI\ApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use JWTAuth;
@@ -44,51 +43,38 @@ class SongController extends Controller
         return response()->json(['data' => $song], 200);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, $id)
     {
         $song = Auth::user()->songs()->whereId($id)->first();
         if ($request->hasFile('file')) {
-            //Save audio file in Directory
+            // Delete previous audio file
+            try{
+                \Storage::delete(public_path('uploads/songs/'.$song->file_name));
+            }catch (\Exception $e){
+                // @todo Log error to file
+            }
+            //Save new audio file in Directory
             $audio_file = $request->file('file');
             $ext = $audio_file->extension();
             $ext = ($ext === 'mpga' || $ext === 'bin') ? 'mp3' : $audio_file->extension();
             $filename = md5($audio_file->getClientOriginalName() . microtime()) . '.' . $ext;
             $location = public_path('uploads/songs/');
-
             if (!$audio_file->move($location, $filename)) {
                 return response()->json(['error' => 'Audio file not saved'], 413);
             }
-        } else {
-            // File not uploaded
-            return $this->processUploadError($request);
+            $song->file_name = $filename;
         }
-        $song->update($request->all());
+
+        $song->album_id = $request->get('album_id');
+        $song->genre_id = $request->get('genre_id');
+        // Save to database
+        $song->fill($request->all())->save();
         return response()->json(['data' => $song], 200);
-    }
-
-    public function storeLike($id)
-    {
-        $like = Like::firstOrNew(array('property_id' => $id));
-        $user = Auth::id();
-
-        try {
-            $liked = Like::get_like_user($id);
-        } catch (Exception $ex) {
-            $liked = null;
-        }
-
-        if ($liked) {
-            $liked->total_likes -= 1;
-            $liked->status = false;
-            $liked->save();
-        } else {
-            $like->user_id = $user;
-            $like->total_likes += 1;
-            $like->status = true;
-            $like->save();
-        }
-
-        return Redirect::to('/detalle/propiedad/' . $id);
     }
 
     public function create(Request $request)
@@ -130,6 +116,7 @@ class SongController extends Controller
                 $song = new Song($request->all());
                 $song->file_name = $filename;
                 $song->album_id = $request->get('album_id');
+                $song->genre_id = $request->get('genre_id');
 
                 // Associate song to authenticated user
                 $song->user()->associate(Auth::user());

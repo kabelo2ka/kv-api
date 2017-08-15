@@ -26,6 +26,9 @@ Route::group(['prefix' => 'v1'], function(){
     Route::get('/users/{user}', function (App\User $user) {
         return $user;
     });
+    Route::patch('/users', [
+        'uses' => 'UserController@update'
+    ]);
     Route::post('/user/authenticate', [
         'uses' => 'UserController@signIn'
     ]);
@@ -50,6 +53,11 @@ Route::group(['prefix' => 'v1'], function(){
         'middleware' => 'auth.jwt'
     ]);
     Route::get('/songs/{id}', 'SongController@show');
+    Route::patch('/songs/{id}', [
+        'uses' => 'SongController@update',
+        'middleware' => 'auth.jwt'
+    ]);
+
     Route::get('songs/{id}/stream', 'SongController@stream');
     Route::post('song/like', [
         'as' => 'song.like',
@@ -64,7 +72,6 @@ Route::group(['prefix' => 'v1'], function(){
     ]);
 
     Route::post('/songs/plays', 'SongController@storePlay');
-    Route::get('/songs/{id}', 'SongController@show');
     Route::get('/songs/{song}/plays', 'SongController@storePlay');
 
     Route::post('comment/like', [

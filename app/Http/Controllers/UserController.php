@@ -71,5 +71,22 @@ class UserController extends Controller
         return response()->json(compact('user'));
     }
 
+    /**
+     * Update user account data
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request)
+    {
+        $user = User::findOrFail($request->id);
+        // User can only change their username once in 60 days
+        //@ todo: Check if user hasn't changed username in the last 60 days
+        // if($user->canChangeUsername()); // returns boolean
+        // Validate new user email
+        //@ todo: Send verification email to user before updating their email address
+        // $user->verifyEmail(); // Sends email to user
+        $user->fill($request->all())->save();
+        return response()->json(['data'=>$user], 200);
+    }
 
 }

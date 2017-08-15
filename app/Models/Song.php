@@ -110,5 +110,9 @@ class Song extends Model
         return (int) Redis::get('songs:' . $this->id . ':plays') | 0;
     }
 
+    public function getLyricsAttribute($value)
+    {
+        return $value === NULL || $value === '' ? 'Not available.' : $value;
+    }
 
 }
