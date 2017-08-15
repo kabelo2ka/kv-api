@@ -21,7 +21,7 @@ class Song extends Model
         'name', 'file_name', 'lyrics',
     ];
 
-    protected $appends = array('is_liked', 'plays_count', 'is_admin', 'album', 'url', 'created_at_ago');
+    protected $appends = array('is_liked', 'likes_count', 'plays_count', 'is_admin', 'album', 'url', 'created_at_ago');
 
     public function artists()
     {
@@ -98,6 +98,11 @@ class Song extends Model
     public function getCreatedAtAgoAttribute()
     {
         return $this->created_at->diffForHumans();
+    }
+
+    public function getLikesCountAttribute()
+    {
+        return (int) $this->likes()->count();
     }
 
     public function getPlaysCountAttribute()
