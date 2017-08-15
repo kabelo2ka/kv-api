@@ -24,8 +24,17 @@ class UserCommented implements ShouldBroadcast
      */
     public function __construct($comment)
     {
-        $comment = Comment::whereId($comment->id)->with('author')->get();
         $this->comment = $comment;
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith()
+    {
+        return ['comment' => Comment::whereId($this->comment->id)->with('author')->first()];
     }
 
     /**

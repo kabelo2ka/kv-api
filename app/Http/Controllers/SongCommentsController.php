@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserCommented;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Auth;
@@ -22,16 +23,6 @@ class SongCommentsController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
@@ -46,29 +37,8 @@ class SongCommentsController extends Controller
         $comment->song_id = $song;
         $comment->body = $request->get('body');
         $comment->save();
+        broadcast(new UserCommented($comment));
         return response()->json(['data'=>'success'], 200);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Comment  $comments
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Comment $comments)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Comment  $comments
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Comment $comments)
-    {
-        //
     }
 
     /**
