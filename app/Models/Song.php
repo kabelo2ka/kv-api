@@ -17,11 +17,9 @@ class Song extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'name', 'file_name', 'lyrics',
-    ];
+    protected $fillable = array('name', 'file_name', 'lyrics');
 
-    protected $appends = array('is_liked', 'likes_count', 'plays_count', 'is_admin', 'album', 'url', 'created_at_ago');
+    protected $appends = array('is_liked', 'likes_count', 'plays_count', 'is_admin', 'url', 'created_at_ago');
 
     public function artists()
     {
@@ -46,13 +44,6 @@ class Song extends Model
     public function comments()
     {
         return $this->hasMany('App\Models\Comment');
-    }
-
-    public function getAlbumAttribute()
-    {
-        //if (!$this->relationLoaded('album')) $this->load('album');
-
-        //return $this->getRelation('album') ?: self::defaultAlbum();
     }
 
     public static function defaultAlbum(){
@@ -114,5 +105,28 @@ class Song extends Model
     {
         return $value === NULL || $value === '' ? 'Not available.' : $value;
     }
+
+    /**
+     * Search user by keyword
+     *
+     * @param $query
+     * @param $keyword
+     * @return mixed
+     */
+    public function scopeSearchByKeyword($query, $keyword)
+    {
+        if ($keyword!='') {
+            $query->where(function ($query) use ($keyword) {
+                $query->where("name", "LIKE", "%$keyword%");
+                    //->orWhere("lyrics", "LIKE", "%$keyword%")
+                    //->orWhere("phone", "LIKE", "%$keyword%");
+            });
+        }
+        return $query;
+    }
+
+
+
+
 
 }

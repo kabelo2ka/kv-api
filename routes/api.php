@@ -45,7 +45,8 @@ Route::group(['prefix' => 'v1'], function(){
         'middleware' => 'auth.jwt'
     ]);
 
-
+    // Search Songs
+    Route::get('/songs/search', 'SongController@search');
 
     Route::get('/songs', 'SongController@index');
     Route::post('/song', [

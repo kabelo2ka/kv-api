@@ -132,6 +132,13 @@ class SongController extends Controller
         }
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->get('q');
+        $songs = Song::SearchByKeyword($query)->with('user', 'genre', 'album')->take(10)->get();
+        return response()->json(['data'=>$songs], 200);
+    }
+
     public function stream($id)
     {
         //$filename = base_path('resources/audio/' . $id . '.mp3');
