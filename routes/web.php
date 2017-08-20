@@ -12,9 +12,10 @@
 */
 
 Route::get('test', function () {
-    //return \App\Models\Song::with(['artists', 'genre'])->get();
-    //return \App\Models\Song::whereId(21)->with('comments.author')->orderBy('created_at', 'desc')->get();
-    return \App\Models\Comment::first()->author()->first();
+    $comment = \App\Models\Comment::first();
+    $user = \App\User::first();
+    $user->notify(new \App\Notifications\UserCommented($comment));
+    return 'Sent';
 });
 
 Route::get('php.info', function () {

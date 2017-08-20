@@ -17,7 +17,7 @@ class Comment extends Model
 
     public function song()
     {
-        return $this->belongsTo('App\Model\Song');
+        return $this->belongsTo('App\Models\Song');
     }
 
     public function getCreatedAtAgoAttribute()
