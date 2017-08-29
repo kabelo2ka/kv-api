@@ -99,6 +99,11 @@ Route::group(['prefix' => 'v1'], function(){
         'uses' =>  'AlbumController@show'
     ]);
 
+    Route::get('/notifications', [
+        'uses' => 'NotificationsController@index',
+        'middleware' => 'auth.jwt',
+    ]);
+
 
 });
 
