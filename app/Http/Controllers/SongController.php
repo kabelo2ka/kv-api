@@ -132,6 +132,19 @@ class SongController extends Controller
         }
     }
 
+    /**
+     * Uplaod Audio File
+     */
+    public function uploadFile(Request $request)
+    {
+        $file = $request->get('file');
+
+        // Process file
+
+        $filepath = 'path/to/audio/file';
+        return response()->json(['file', $filepath], 200);
+    }
+
     public function search(Request $request)
     {
         $query = $request->get('q');
