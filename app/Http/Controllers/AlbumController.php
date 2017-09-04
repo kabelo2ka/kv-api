@@ -31,5 +31,19 @@ class AlbumController extends Controller
 
     }
 
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'album_name' => "required|min:3|unique:albums,name,NULL,id,user_id," . Auth::id()
+        ], [
+            'album_name.unique' => 'You already have an album named "' . $request->get('album_name') . '".'
+        ]);
+        $album_name = $request->get('album_name');
+        $album_image = $request->get('album_image');
+        $album = Auth::user()->albums()->create(['name' => $album_name, 'image' => $album_image]);
+
+        return response()->json(['data'=>$album],200);
+    }
+
 
 }

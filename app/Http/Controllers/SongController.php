@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\UserPlayedSong;
+use App\Http\Requests\SongRequest;
 use App\Models\Song;
 use Auth;
 use File;
@@ -77,72 +78,33 @@ class SongController extends Controller
         return response()->json(['data' => $song], 200);
     }
 
-    public function create(Request $request)
+    public function create(SongRequest $request)
     {
-        $this->validate($request, [
-            'name'     => 'required|min:3|unique:songs,name,NULL,id,album_id,' . $request->get('album_id') . ',user_id,"' . Auth::id(),
-            'file'     => 'required|mimes:mpga,bin,wav,ogg',
-            'genre_id' => 'required',
-            'album_id' => 'required',
-        ], [
-            'name.unique' => 'You already have a song titled "' . $request->get('name') . '" in the selected album.'
-        ]);
-
-        // Create new album if album id == "create".
-        if ($request->get('album_id') == 'create') {
-            $this->validate($request, [
-                'album_name' => "required|min:3|unique:albums,name,NULL,id,user_id," . Auth::id()
-            ], [
-                'album_name.unique' => 'You already have an album named "' . $request->get('album_name') . '".'
-            ]);
-            $album_name = $request->get('album_name');
-            $album_image = $request->get('album_image');
-            $album = Auth::user()->albums()->create(['name' => $album_name, 'image' => $album_image]);
-            $request->merge(['album_id' => $album->id]);
-        } elseif ($request->get('album_id') == 0) {
-            $request->merge(['album_id' => NULL]);
-        }
-
-        if ($request->hasFile('file')) {
-            //Save audio file in Directory
-            $audio_file = $request->file('file');
-            $ext = $audio_file->extension();
-            $ext = ($ext === 'mpga' || $ext === 'bin') ? 'mp3' : $audio_file->extension();
-            $filename = md5($audio_file->getClientOriginalName() . microtime()) . '.' . $ext;
-            $location = public_path('uploads/songs/');
-
-            if ($audio_file->move($location, $filename)) {
-                // Create song
-                $song = new Song($request->all());
-                $song->file_name = $filename;
-                $song->album_id = $request->get('album_id');
-                $song->genre_id = $request->get('genre_id');
-
-                // Associate song to authenticated user
-                $song->user()->associate(Auth::user());
-                // Save to database
-                $song->save();
-                return response()->json(['data' => $song], 200);
-            } else {
-                return response()->json(['error' => 'Audio file not saved'], 413);
-            }
-        } else {
-            // File not uploaded
-            return $this->processUploadError($request);
-        }
+        $song = new Song($request->all());
+        $song->album_id = $request->get('album_id');
+        $song->genre_id = $request->get('genre_id');
+        $song->user()->associate(Auth::user());
+        $result = $song->save();
+        return response()->json(['data'=>$result], 200);
     }
 
     /**
-     * Uplaod Audio File
+     * Upload Audio File
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function uploadFile(Request $request)
     {
-        $file = $request->get('file');
-
-        // Process file
-
-        $filepath = 'path/to/audio/file';
-        return response()->json(['file', $filepath], 200);
+        $audio_file = $request->file('file');
+        $ext = $audio_file->getClientOriginalExtension();
+        $ext = ($ext === 'mpga' || $ext === 'bin') ? 'mp3' : $ext;
+        $filename = md5($audio_file->getClientOriginalName() . microtime()) . '.' . $ext;
+        $location = storage_path('app/uploads/tmp/');
+        if ($audio_file->move($location, $filename)) {
+            return response()->json(['file' => $filename], 200);
+        } else {
+            return response()->json(['error' => 'Audio file not saved'], 413);
+        }
     }
 
     public function search(Request $request)

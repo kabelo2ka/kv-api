@@ -49,16 +49,15 @@ Route::group(['prefix' => 'v1'], function(){
     Route::get('/songs/search', 'SongController@search');
 
     Route::get('/songs', 'SongController@index');
-    Route::post('/song', [
-        'uses' => 'SongController@create',
-        'middleware' => 'auth.jwt'
-    ]);
+    Route::post('songs/upload', 'SongController@uploadFile')
+        ->middleware('auth.jwt');
+    Route::post('/song', 'SongController@create')
+        ->middleware('auth.jwt');
     Route::get('/songs/{id}', 'SongController@show');
     Route::patch('/songs/{id}', [
         'uses' => 'SongController@update',
         'middleware' => 'auth.jwt'
     ]);
-    Route::post('songs/upload', 'SongController@uploadFile');
     Route::get('songs/{id}/stream', 'SongController@stream');
     Route::post('song/like', [
         'as' => 'song.like',
@@ -120,7 +119,7 @@ ApiRoute::group(
         //ApiRoute::resource('users', 'UserController');
         //ApiRoute::resource('songs', 'SongController');
         //ApiRoute::resource('artists', 'ArtistController');
-        ApiRoute::resource('genres', 'GenreController');
+        //ApiRoute::resource('genres', 'GenreController');
         ApiRoute::resource('albums', 'AlbumController');
     }
 );
