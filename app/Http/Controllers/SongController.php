@@ -80,8 +80,25 @@ class SongController extends Controller
 
     public function create(SongRequest $request)
     {
+        $temp_file = storage_path('app/uploads/tmp/').$request->get('file_name');
+        $new_file = public_path('uploads/songs/').$request->get('file_name');
+        if( ! File::move($temp_file, $new_file)){
+            return response()->json(['error' => 'Could not move file'], 500);
+        };
         $song = new Song($request->all());
-        $song->album_id = $request->get('album_id');
+        if($request->get('album_id') === 'create'){
+            $this->validate($request, [
+                'album_name' => "required|min:3|unique:albums,name,NULL,id,user_id," . Auth::id()
+            ], [
+                'album_name.unique' => 'You already have an album named "' . $request->get('album_name') . '".'
+            ]);
+            $album_name = $request->get('album_name');
+            $album = Auth::user()->albums()->create(['name' => $album_name]);
+            $album = $album->save();
+            $song->album_id = $album->id;
+        }else{
+            $song->album_id = $request->get('album_id');
+        }
         $song->genre_id = $request->get('genre_id');
         $song->user()->associate(Auth::user());
         $result = $song->save();
@@ -101,7 +118,7 @@ class SongController extends Controller
         $filename = md5($audio_file->getClientOriginalName() . microtime()) . '.' . $ext;
         $location = storage_path('app/uploads/tmp/');
         if ($audio_file->move($location, $filename)) {
-            return response()->json(['file' => $filename], 200);
+            return response()->json(['filename' => $filename], 200);
         } else {
             return response()->json(['error' => 'Audio file not saved'], 413);
         }

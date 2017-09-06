@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,7 +16,7 @@ use Illuminate\Http\Request;
 });*/
 
 
-Route::group(['prefix' => 'v1'], function(){
+Route::group(['prefix' => 'v1'], function () {
 
     Route::post('/user', [
         'uses' => 'UserController@signUp'
@@ -36,12 +34,12 @@ Route::group(['prefix' => 'v1'], function(){
         'uses' => 'UserController@checkToken',
         'middleware' => 'auth.jwt'
     ]);
-    Route::get('/users', function(){
+    Route::get('/users', function () {
         return \App\User::whereUsername('kabelo')->get();
     });
 
     Route::get('/user/albums', [
-        'uses' =>  'AlbumController@authAlbums',
+        'uses' => 'AlbumController@authAlbums',
         'middleware' => 'auth.jwt'
     ]);
 
@@ -51,7 +49,7 @@ Route::group(['prefix' => 'v1'], function(){
     Route::get('/songs', 'SongController@index');
     Route::post('songs/upload', 'SongController@uploadFile')
         ->middleware('auth.jwt');
-    Route::post('/song', 'SongController@create')
+    Route::post('/songs', 'SongController@create')
         ->middleware('auth.jwt');
     Route::get('/songs/{id}', 'SongController@show');
     Route::patch('/songs/{id}', [
@@ -66,7 +64,7 @@ Route::group(['prefix' => 'v1'], function(){
     ]);
 
     Route::get('/songs/{song}/comments', 'SongCommentsController@index');
-    Route::post('/songs/{song}/comments',  [
+    Route::post('/songs/{song}/comments', [
         'uses' => 'SongCommentsController@store',
         'middleware' => 'auth.jwt',
     ]);
@@ -78,24 +76,24 @@ Route::group(['prefix' => 'v1'], function(){
         'as' => 'comment.like',
         'uses' => 'LikeController@likeComment',
         'middleware' => 'auth.jwt',
-        ]);
+    ]);
 
 
     Route::get('/genres', 'GenreController@index');
 
 
     Route::get('/artists', [
-        'uses' =>  'ArtistController@index'
+        'uses' => 'ArtistController@index'
     ]);
     Route::get('/artists/{id}', [
-        'uses' =>  'ArtistController@show'
+        'uses' => 'ArtistController@show'
     ]);
 
     Route::get('/albums', [
-        'uses' =>  'AlbumController@index'
+        'uses' => 'AlbumController@index'
     ]);
     Route::get('/albums/{id}', [
-        'uses' =>  'AlbumController@show'
+        'uses' => 'AlbumController@show'
     ]);
 
     Route::get('/notifications', [
@@ -105,10 +103,6 @@ Route::group(['prefix' => 'v1'], function(){
 
 
 });
-
-
-
-
 
 
 ApiRoute::group(
