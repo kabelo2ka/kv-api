@@ -51,7 +51,7 @@ Route::group(['prefix' => 'v1'], function () {
         ->middleware('auth.jwt');
     Route::post('/songs', 'SongController@create')
         ->middleware('auth.jwt');
-    Route::get('/songs/{id}', 'SongController@show');
+    Route::get('/songs/{slug}', 'SongController@show');
     Route::patch('/songs/{id}', [
         'uses' => 'SongController@update',
         'middleware' => 'auth.jwt'

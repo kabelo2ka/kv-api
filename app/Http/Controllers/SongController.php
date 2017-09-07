@@ -30,9 +30,9 @@ class SongController extends Controller
         return response(404);
     }
 
-    public function show($id)
+    public function show($slug)
     {
-        $song = Song::whereId($id)->with(
+        $song = Song::whereSlug($slug)->with(
             [
                 'comments' => function ($query) {
                     return $query->orderByDesc('created_at')->with('author')->get();

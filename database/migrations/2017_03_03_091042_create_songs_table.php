@@ -35,6 +35,8 @@ class CreateSongsTable extends Migration
 
             $table->string('file_name');
 
+            $table->string('slug')->unique()->nullable();
+
             $table->integer('likes')->default(0);
 
             $table->longText('lyrics')->nullable();

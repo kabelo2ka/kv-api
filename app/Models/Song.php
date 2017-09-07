@@ -2,16 +2,31 @@
 
 namespace App\Models;
 
-use Froiden\RestAPI\ApiModel;
 use Illuminate\Database\Eloquent\Model;
-use Auth;
 use Illuminate\Support\Facades\Redis;
 use JWTAuth;
-use Carbon\Carbon;
 
 
 class Song extends Model
 {
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($song) {
+            // @todo Delete audio file
+            // File::delete(storage_path('songs/' . $song->file_name));
+            // @todo Delete comments
+            // $song->comments()->each->delete();
+        });
+
+        static::created(function ($song) {
+            $song->slug = $song->name;
+            $song->save();
+        });
+
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -46,7 +61,8 @@ class Song extends Model
         return $this->hasMany('App\Models\Comment');
     }
 
-    public static function defaultAlbum(){
+    public static function defaultAlbum()
+    {
         return [
             'id' => 0,
             'name' => 'Miscellaneous',
@@ -66,7 +82,8 @@ class Song extends Model
                 $like = $this->likes()->whereUserId($user->id)->first();
                 return !is_null($like) ? true : false;
             }
-        }  catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         return false;
     }
 
@@ -76,14 +93,15 @@ class Song extends Model
             if ($user = JWTAuth::parseToken()->authenticate()) {
                 return $this->user_id == $user->id;
             }
-        }  catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         return false;
     }
 
     public function getUrlAttribute()
     {
         //return 'http://www.kasivibe.com/uploads/songs/' . $this->file_name;
-        return 'http://www.kasivibe.com/api/v1/songs/' . $this->id . '/stream';
+        return '//kasivibe.com/api/v1/songs/' . $this->id . '/stream';
     }
 
     public function getCreatedAtAgoAttribute()
@@ -93,12 +111,12 @@ class Song extends Model
 
     public function getLikesCountAttribute()
     {
-        return (int) $this->likes()->count();
+        return (int)$this->likes()->count();
     }
 
     public function getPlaysCountAttribute()
     {
-        return (int) Redis::get('songs:' . $this->id . ':plays') | 0;
+        return (int)Redis::get('songs:' . $this->id . ':plays') | 0;
     }
 
     public function getLyricsAttribute($value)
@@ -115,18 +133,27 @@ class Song extends Model
      */
     public function scopeSearchByKeyword($query, $keyword)
     {
-        if ($keyword!='') {
+        if ($keyword != '') {
             $query->where(function ($query) use ($keyword) {
                 $query->where("name", "LIKE", "%$keyword%");
-                    //->orWhere("lyrics", "LIKE", "%$keyword%")
-                    //->orWhere("phone", "LIKE", "%$keyword%");
+                //->orWhere("lyrics", "LIKE", "%$keyword%")
+                //->orWhere("phone", "LIKE", "%$keyword%");
             });
         }
         return $query;
     }
 
 
+    public function setSlugAttribute($value)
+    {
+        $slug = str_slug($value);
 
+        if (static::whereSlug($slug)->exists()) {
+            $slug = "{$slug}-" . $this->id;
+        }
+
+        $this->attributes['slug'] = $slug;
+    }
 
 
 }
