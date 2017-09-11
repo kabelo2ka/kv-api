@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use Froiden\RestAPI\ApiModel;
 use Illuminate\Database\Eloquent\Model;
 
-class Album extends ApiModel
+class Album extends Model
 {
     const IMAGES_DIR = 'http://www.kasivibe.com/uploads/albums/images/';
     const DEFAULT_ART = 'http://www.kasivibe.com/img/no-art.png';
@@ -16,7 +15,7 @@ class Album extends ApiModel
 
     protected $attributes = array(
         'name' => 'Mili',
-        'image' => 'http://www.kasivibe.com/img/no-art.png',
+        'image' => self::DEFAULT_ART,
     );
 
     public function songs()
@@ -31,9 +30,9 @@ class Album extends ApiModel
 
     public function getImageAttribute($value)
     {
-        return $value
-            ? self::IMAGES_DIR . $value
-            : self::DEFAULT_ART;
+        return $value && $value != static::DEFAULT_ART
+            ? static::IMAGES_DIR . $value
+            : static::DEFAULT_ART;
     }
 
     public function setAlbumIdAttribute($value)

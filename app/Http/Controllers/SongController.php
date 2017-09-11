@@ -86,6 +86,7 @@ class SongController extends Controller
             return response()->json(['error' => 'Could not move file'], 500);
         };
         $song = new Song($request->all());
+
         if($request->get('album_id') === 'create'){
             $this->validate($request, [
                 'album_name' => "required|min:3|unique:albums,name,NULL,id,user_id," . Auth::id()
@@ -99,6 +100,7 @@ class SongController extends Controller
         }else{
             $song->album_id = $request->get('album_id');
         }
+
         $song->genre_id = $request->get('genre_id');
         $song->user()->associate(Auth::user());
         $result = $song->save();
