@@ -41,7 +41,12 @@ class CreateSongsTable extends Migration
 
             $table->longText('lyrics')->nullable();
 
-            $table->enum('active', [0,1])->default(1);
+            $table->integer('length')->default(0);
+
+            $table->integer('active', [0,1])->default(1);
+            $table->integer('downloadable', [0,1])->default(0);
+            $table->integer('commentable', [0,1])->default(1);
+            $table->integer('private', [0,1])->default(0);
 
             $table->softDeletes();
             $table->timestamps();
