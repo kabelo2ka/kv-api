@@ -12,7 +12,7 @@ class AlbumController extends Controller
 
     public function index()
     {
-        $albums = Album::with('user')->get();
+        $albums = Album::with('user')->orderByDesc('created_at')->get();
         return response(['data' => $albums], 200);
     }
 

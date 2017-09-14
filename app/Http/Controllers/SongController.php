@@ -6,11 +6,14 @@ use App\Events\UserPlayedSong;
 use App\Http\Requests\SongRequest;
 use App\Models\Song;
 use Auth;
+use DateTime;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use JWTAuth;
 use Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class SongController extends Controller
 {
@@ -155,6 +158,37 @@ class SongController extends Controller
             return response()->json('File Not Found', 404);
         }
     }
+
+
+    public function download(Request $request, $id)
+    {
+        $song = Song::findOrFail($id);
+
+        if( $song->downloadable ){
+            $filename = public_path('uploads/songs/' . $song->file_name);
+            // check if file exists
+            if ( ! file_exists($filename)) {
+                return response()->json('File Not Found', 404);
+            }
+
+            $filesize = (int)File::size($filename);
+            $file = File::get($filename);
+            $response = Response::make($file, 200);
+            $response->header('Content-Type', 'File Transfer');
+            $response->header('Content-Description', 'audio/mpeg');
+            $response->header('Content-Disposition', 'attachment; filename=' .sprintf('"%s [www.kasivibe.com].mp3"', addcslashes(basename($song->name), '"\\')));
+            $response->header('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+            $response->header('Expires', '0');
+            $response->header('Connection', 'Keep-Alive');
+            $response->header('Content-Transfer-Encoding', 'binary');
+            $response->header('Content-Type', 'audio/mpeg');
+            $response->header('Content-Length', $filesize);
+
+            return $response;
+        }
+        return response()->json(['error' => 'Song is not downloadable.'], 403);
+    }
+    
 
     public function storePlay(Request $request)
     {

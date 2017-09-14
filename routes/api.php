@@ -57,6 +57,7 @@ Route::group(['prefix' => 'v1'], function () {
         'middleware' => 'auth.jwt'
     ]);
     Route::get('songs/{id}/stream', 'SongController@stream');
+    Route::get('songs/{id}/download', 'SongController@download');
     Route::post('song/like', [
         'as' => 'song.like',
         'uses' => 'LikeController@likeSong',
