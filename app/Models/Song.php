@@ -34,7 +34,7 @@ class Song extends Model
      */
     protected $fillable = array('name', 'file_name', 'lyrics');
 
-    protected $appends = array('is_liked', 'likes_count', 'plays_count', 'download_link', 'is_admin', 'url', 'created_at_ago');
+    protected $appends = array('is_liked', 'likes_count', 'downloads_count', 'plays_count', 'download_link', 'is_admin', 'url', 'created_at_ago');
 
     public function artists()
     {
@@ -117,6 +117,11 @@ class Song extends Model
     public function getPlaysCountAttribute()
     {
         return (int)Redis::get('songs:' . $this->id . ':plays') | 0;
+    }
+
+    public function getDownloadsCountAttribute()
+    {
+        return (int)Redis::get('songs:' . $this->id . ':downloads') | 0;
     }
 
     public function getLyricsAttribute($value)

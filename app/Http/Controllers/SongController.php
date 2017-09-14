@@ -171,6 +171,13 @@ class SongController extends Controller
                 return response()->json('File Not Found', 404);
             }
 
+            // Record download on redis
+            // @todo don't record multiple downloads from one IP in a certain time period
+            Redis::incr('songs:' . $song->id . ':downloads');
+            // Create UserDownloadedSongEvent
+            //event(new UserPlayedSong($song->id));
+
+            // Generate file and headers
             $filesize = (int)File::size($filename);
             $file = File::get($filename);
             $response = Response::make($file, 200);
