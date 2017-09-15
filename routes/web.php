@@ -22,12 +22,85 @@ Route::get('php.info', function () {
     return phpinfo();
 });
 
-Route::get('/register/confirm', 'Auth\RegisterConfirmationController@index')->name('register.confirm-email');
+Route::get('test', function () {
+    $filename = public_path('uploads/songs/Wild-Ones.mp3');
+    $getID3 = new getID3;
+    $ThisFileInfo = $getID3->analyze($filename);
 
-Route::get('{all?}', function () {
-    ob_start();
-    require(public_path('app/index.html'));
-    return ob_get_clean();
-})->where('all', '.+');
+    // Optional: copies data from all subarrays of [tags] into [comments] so
+    // metadata is all available in one location for all tag formats
+    // metainformation is always available under [tags] even if this is not called
+    getid3_lib::CopyTagsToComments($ThisFileInfo);
+
+    $cover = null;
+    if (isset($getID3->info['id3v2']['APIC'][0]['data'])) {
+        $cover = $getID3->info['id3v2']['APIC'][0]['data'];
+    } elseif (isset($getID3->info['id3v2']['PIC'][0]['data'])) {
+        $cover = $getID3->info['id3v2']['PIC'][0]['data'];
+    }
+
+    if (isset($getID3->info['id3v2']['APIC'][0]['image_mime'])) {
+        $mimetype = $getID3->info['id3v2']['APIC'][0]['image_mime'];
+    } else {
+        $mimetype = 'image/jpeg'; // or null; depends on your needs
+    }
+
+    if ($cover !== null) {
+        // Send file
+        header("Content-Type: " . $mimetype);
+
+        if (isset($getID3->info['id3v2']['APIC'][0]['image_bytes'])) {
+            header("Content-Length: " . $getID3->info['id3v2']['APIC'][0]['image_bytes']);
+        }
+
+        echo($cover);
+    }
+
+    });
+
+
+Route::get('tes2', function () {
+    $filename = public_path('uploads/songs/Wild-Ones.mp3');
+    $getID3 = new getID3;
+    $ThisFileInfo = $getID3->analyze($filename);
+
+    // Optional: copies data from all subarrays of [tags] into [comments] so
+    // metadata is all available in one location for all tag formats
+    // metainformation is always available under [tags] even if this is not called
+    getid3_lib::CopyTagsToComments($ThisFileInfo);
+
+    $cover = null;
+    if (isset($getID3->info['id3v2']['APIC'][0]['data'])) {
+        $cover = $getID3->info['id3v2']['APIC'][0]['data'];
+    } elseif (isset($getID3->info['id3v2']['PIC'][0]['data'])) {
+        $cover = $getID3->info['id3v2']['PIC'][0]['data'];
+    }
+
+    if (isset($getID3->info['id3v2']['APIC'][0]['image_mime'])) {
+        $mimetype = $getID3->info['id3v2']['APIC'][0]['image_mime'];
+    } else {
+        $mimetype = 'image/jpeg'; // or null; depends on your needs
+    }
+
+    if ($cover !== null) {
+        // Send file
+        header("Content-Type: " . $mimetype);
+
+        if (isset($getID3->info['id3v2']['APIC'][0]['image_bytes'])) {
+            header("Content-Length: " . $getID3->info['id3v2']['APIC'][0]['image_bytes']);
+        }
+
+        echo base64_decode($cover);
+    }
+
+    });
+
+    Route::get('/register/confirm', 'Auth\RegisterConfirmationController@index')->name('register.confirm-email');
+
+    Route::get('{all?}', function () {
+        ob_start();
+        require(public_path('app/index.html'));
+        return ob_get_clean();
+    })->where('all', '.+');
 
 
