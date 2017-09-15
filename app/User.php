@@ -28,6 +28,10 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    protected $casts = [
+        'confirmed' => 'boolean'
+    ];
+
     public function songs()
     {
         return $this->hasMany('App\Models\Song');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Froiden\RestAPI\ApiController;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\User;
 use JWTAuth;
@@ -21,15 +22,16 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8'
         ]);
-        $user = new User([
+        $user = User::forceCreate([
             'username' => $request->input('username'),
             'email' => $request->input('email'),
-            'password' => bcrypt($request->input('password'))
+            'password' => bcrypt($request->input('password')),
+            'confirmation_token' => str_limit(md5($request->input('email')).str_random(), 25, ''),
         ]);
-        $user->save();
+        event(new Registered($user));
         return response()->json([
             'message' => 'Successfully created user!'
-        ], 201);
+        ], 200);
     }
 
     public function signIn(Request $request)

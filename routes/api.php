@@ -48,7 +48,8 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::get('/songs', 'SongController@index');
     Route::post('songs/upload', 'SongController@uploadFile')
-        ->middleware('auth.jwt');
+        ->middleware('auth.jwt')
+        ->middleware('must-be-confirmed');
     Route::post('/songs', 'SongController@create')
         ->middleware('auth.jwt');
     Route::get('/songs/{slug}', 'SongController@show');

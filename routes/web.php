@@ -22,6 +22,8 @@ Route::get('php.info', function () {
     return phpinfo();
 });
 
+Route::get('/register/confirm', 'Auth\RegisterConfirmationController@index')->name('register.confirm-email');
+
 Route::get('{all?}', function () {
     ob_start();
     require(public_path('app/index.html'));
