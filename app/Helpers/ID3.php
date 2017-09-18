@@ -16,6 +16,7 @@ class ID3
 
     private $filename;
     private $getID3;
+    protected $info;
 
     /**
      * ID3 constructor.
@@ -35,14 +36,16 @@ class ID3
         }
     }
 
-    public function analyze()
+    public function analyze($filename = null)
     {
-        return $this->getID3->analyze($this->filename);
+        if($filename !== null) { $this->filename = $filename; };
+        $this->info = $this->getID3->analyze($this->filename);
+        return $this->info;
     }
 
-    public function getInfo()
+    public function getInfo($filename = null)
     {
-        return $this->analyze();
+        return $this->analyze($filename);
     }
 
 
@@ -64,14 +67,10 @@ class ID3
         }
 
         if ($cover !== null) {
-            // Send file
-            header("Content-Type: " . $mimetype);
+            $cover='data:'.$this->info['comments']['picture'][0]['image_mime'].';charset=utf-8;base64,'.base64_encode($this->info['comments']['picture'][0]['data']);
+            echo '<img src="'. @$cover.'"/>'; exit();
 
-            if (isset($getID3->info['id3v2']['APIC'][0]['image_bytes'])) {
-                header("Content-Length: " . $getID3->info['id3v2']['APIC'][0]['image_bytes']);
-            }
-
-            return $cover;
+            return @$cover;
         }
         return false;
     }
@@ -80,4 +79,5 @@ class ID3
     {
         return $this->getCoverImage();
     }
+
 }
