@@ -59,7 +59,7 @@ class User extends Authenticatable
             ? 'http://www.kasivibe.com/uploads/users/avatar/' . $value
             : 'https://www.gravatar.com/avatar/' . strtolower( trim(md5($this->attributes['email'])))
 
-            . '?s=100&d=monsterid';
+            . '?s=300&d=wavatar';
             //: 'https://www.kasivibe.com/img/no-avatar.png'
 
     }
