@@ -28,7 +28,7 @@ class SongController extends Controller
     public function delete($id)
     {
         if ($song = Auth::user()->songs()->whereId($id)->delete()) {
-            return response(200);
+            return response()->json(['msg' => 'success'], 200);
         }
         return response(404);
     }

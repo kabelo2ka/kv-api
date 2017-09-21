@@ -103,6 +103,11 @@ Route::group(['prefix' => 'v1'], function () {
         'middleware' => 'auth.jwt',
     ]);
 
+    Route::get('/notifications/{id}/read', [
+        'uses' => 'NotificationsController@markAsRead',
+        'middleware' => 'auth.jwt',
+    ]);
+
 
 });
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\User;
+use Auth;
 use Illuminate\Http\Request;
 
 class NotificationsController extends Controller
@@ -25,5 +26,12 @@ class NotificationsController extends Controller
             }
         }
         return response()->json(['data'=>$formatted_notifications], 200);
+    }
+
+    public function markAsRead($id)
+    {
+        $notification = Auth::user()->unreadNotifications()->firstOrFail($id);
+        $notification->markAsRead();
+        return response()->json(['msg'=>'success'], 200);
     }
 }
