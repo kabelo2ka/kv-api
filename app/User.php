@@ -32,6 +32,23 @@ class User extends Authenticatable
         'confirmed' => 'boolean'
     ];
 
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($song) {
+
+        });
+
+        static::created(function ($song) {
+            $song->slug = $song->name;
+            $song->save();
+        });
+
+    }
+
+
     public function songs()
     {
         return $this->hasMany('App\Models\Song');
@@ -67,6 +84,18 @@ class User extends Authenticatable
     public function getArtistNameAttribute($value)
     {
         return $value ?: $this->username;
+    }
+
+
+    public function setSlugAttribute($value)
+    {
+        $slug = str_slug($value);
+
+        if (static::whereSlug($slug)->exists()) {
+            $slug = "{$slug}-" . $this->id;
+        }
+
+        $this->attributes['slug'] = $slug;
     }
 
 

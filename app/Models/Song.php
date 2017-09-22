@@ -9,6 +9,15 @@ use JWTAuth;
 
 class Song extends Model
 {
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = array('name', 'file_name', 'lyrics');
+
+    protected $appends = array('is_liked', 'likes_count', 'comments_count', 'downloads_count', 'plays_count', 'download_link', 'is_admin', 'url', 'created_at_ago');
+
     public static function boot()
     {
         parent::boot();
@@ -26,15 +35,6 @@ class Song extends Model
         });
 
     }
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = array('name', 'file_name', 'lyrics');
-
-    protected $appends = array('is_liked', 'likes_count', 'downloads_count', 'plays_count', 'download_link', 'is_admin', 'url', 'created_at_ago');
 
     public function artists()
     {
@@ -112,6 +112,11 @@ class Song extends Model
     public function getLikesCountAttribute()
     {
         return (int)$this->likes()->count();
+    }
+
+    public function getCommentsCountAttribute()
+    {
+        return (int)$this->comments()->count();
     }
 
     public function getPlaysCountAttribute()

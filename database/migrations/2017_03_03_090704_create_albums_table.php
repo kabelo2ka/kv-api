@@ -25,6 +25,8 @@ class CreateAlbumsTable extends Migration
 
             $table->string('image')->nullable()->default(NULL);
 
+            $table->string('slug')->unique()->nullable();
+
             $table->enum('active', [0,1])->default(1);
 
             $table->softDeletes();
