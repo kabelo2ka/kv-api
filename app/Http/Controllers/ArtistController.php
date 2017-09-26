@@ -16,9 +16,9 @@ class ArtistController extends Controller
     }
 
 
-    public function show($id)
+    public function show($slug)
     {
-        $artist = User::whereId($id)->where('artist_name', '!=', null)->with('albums', 'songs.user', 'songs.album')->first();
+        $artist = User::whereSlug($slug)->where('artist_name', '!=', null)->with('albums', 'songs.user', 'songs.album')->first();
         return response(['data' => $artist], 200);
     }
 

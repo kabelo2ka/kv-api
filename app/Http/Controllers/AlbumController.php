@@ -16,9 +16,9 @@ class AlbumController extends Controller
         return response(['data' => $albums], 200);
     }
 
-    public function show($id)
+    public function show($slug)
     {
-        $album = Album::whereId($id)->with('user', 'songs.user', 'songs.album')->first();
+        $album = Album::whereSlug($slug)->with('user', 'songs.user', 'songs.album')->first();
         return response(['data' => $album], 200);
     }
 
