@@ -183,6 +183,10 @@ return [
          */
         \Froiden\RestAPI\Providers\ApiServiceProvider::class,
 
+        /*
+         * Intervention Image
+         */
+        Intervention\Image\ImageServiceProvider::class,
 
 
     ],
@@ -237,6 +241,8 @@ return [
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
 
         'ApiRoute' => \Froiden\RestAPI\Facades\ApiRoute::class,
+
+        'Image' => Intervention\Image\Facades\Image::class,
     ],
 
 ];

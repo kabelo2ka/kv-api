@@ -47,6 +47,15 @@ class SongController extends Controller
         return response()->json(['data' => $song], 200);
     }
 
+    public function authSongs()
+    {
+        $user = Auth::user();
+        $songs = $user->songs()->get();
+
+        return response(['data' => $songs], 200);
+
+    }
+
     /**
      * @param Request $request
      * @param $id
@@ -54,7 +63,7 @@ class SongController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $song = Auth::user()->songs()->whereId($id)->first();
+        $song = Auth::user()->songs()->whereId($id)->firstOrFail();
         if ($request->hasFile('file')) {
             // Delete previous audio file
             try{
@@ -81,7 +90,7 @@ class SongController extends Controller
         return response()->json(['data' => $song], 200);
     }
 
-    public function create(SongRequest $request)
+    public function store(SongRequest $request)
     {
         $temp_file = storage_path('app/uploads/tmp/').$request->get('file_name');
         $new_file = public_path('uploads/songs/').$request->get('file_name');

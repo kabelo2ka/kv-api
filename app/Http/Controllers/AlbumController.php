@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Froiden\RestAPI\ApiController;
+use App\Http\Requests\AlbumRequest;
 use App\Models\Album;
-use Illuminate\Http\Request;
 use Auth;
+use Illuminate\Http\Request;
 
 class AlbumController extends Controller
 {
@@ -31,19 +31,43 @@ class AlbumController extends Controller
 
     }
 
-    public function store(Request $request)
+    public function store(AlbumRequest $request)
     {
-        $this->validate($request, [
-            'album_name' => "required|min:3|unique:albums,name,NULL,id,user_id," . Auth::id()
-        ], [
-            'album_name.unique' => 'You already have an album named "' . $request->get('album_name') . '".'
-        ]);
-        $album_name = $request->get('album_name');
-        $album_image = $request->get('album_image');
-        $album = Auth::user()->albums()->create(['name' => $album_name, 'image' => $album_image]);
+        if ($request->has('imageData') && '' !== $imageData = $request->get('imageData')) {
+            $image = base64_decode($imageData);
+            $filename = md5($request->get('album_name') . microtime()) . '.jpg';
+            $path = public_path('uploads/albums/images/' . $filename);
+            \Image::make($image)->resize(512,512)->save($path);
+            $request->merge(['image'=>$filename]);
+        }
 
-        return response()->json(['data'=>$album],200);
+        $album = Auth::user()->albums()->create($request->all());
+
+        return response()->json(['data' => $album], 200);
     }
 
+    public function update(AlbumRequest $request, $slug)
+    {
+        $album = Auth::user()->albums()->whereSlug($slug)->firstOrFail();
+        if ($request->has('imageData') && '' !== $imageData = $request->get('imageData')) {
+            $image = base64_decode($imageData);
+            $filename = md5($request->get('album_name') . microtime()) . '.jpg';
+            $path = public_path('uploads/albums/images/' . $filename);
+            \Image::make($image)->resize(512,512)->save($path);
+            \File::delete(public_path('uploads/albums/images/' . $filename));
+            $request->merge(['image'=>$filename]);
+        }
+
+        $album->update($request->except('imageData'));
+
+        return response()->json(['data' => $album], 200);
+    }
+
+    public function destroy($slug)
+    {
+        $album = auth()->user()->albums()->whereSlug($slug)->firstOrFail();
+        $album->delete();
+        return response()->json(['data', 'Deleted'], 200);
+    }
 
 }

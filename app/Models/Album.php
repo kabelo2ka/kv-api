@@ -10,7 +10,7 @@ class Album extends Model
     const DEFAULT_ART = 'http://www.kasivibe.com/img/no-art.png';
 
     protected $fillable = [
-        'name', 'image'
+        'name', 'image', 'active'
     ];
 
     protected $attributes = array(
@@ -22,13 +22,13 @@ class Album extends Model
     {
         parent::boot();
 
-        static::deleting(function ($song) {
-
+        static::deleting(function ($album) {
+            \File::delete(self::IMAGES_DIR . $album->image);
         });
 
-        static::created(function ($song) {
-            $song->slug = $song->name;
-            $song->save();
+        static::created(function ($album) {
+            $album->slug = $album->name;
+            $album->save();
         });
 
     }

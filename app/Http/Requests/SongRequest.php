@@ -25,13 +25,18 @@ class SongRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'     => 'required|min:3|unique:songs,name,NULL,id,album_id,' . $this->get('album_id') . ',user_id,"' . Auth::id(),
-            'file_name'  => 'required',
+            'name' => 'required|min:3|unique:songs,name,NULL,id,album_id,' . $this->get('album_id') . ',user_id,"' . Auth::id(),
+            'file_name' => 'required',
             'genre_id' => 'required',
             'album_id' => 'required',
         ];
     }
 
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
     public function messages()
     {
         return [

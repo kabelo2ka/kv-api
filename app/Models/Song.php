@@ -9,6 +9,8 @@ use JWTAuth;
 
 class Song extends Model
 {
+    const SONGS_DIR = 'http://www.kasivibe.com/uploads/songs/';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -23,10 +25,16 @@ class Song extends Model
         parent::boot();
 
         static::deleting(function ($song) {
-            // @todo Delete audio file
-            // File::delete(storage_path('songs/' . $song->file_name));
-            // @todo Delete comments
-            // $song->comments()->each->delete();
+            // @todo Research: Does soft delete fire this event? If yes, don't the song's related data.
+            /*// Delete audio file
+            \File::delete(self::SONGS_DIR . $song->name);
+            // Delete comments
+            $song->comments()->each->delete();
+            // Delete Plays Count
+            Redis::del('songs:' . $song->id . ':plays');
+            // Delete Downloads Count
+            Redis::del('songs:' . $song->id . ':downloads');*/
+
         });
 
         static::created(function ($song) {

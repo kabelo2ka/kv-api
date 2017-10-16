@@ -25,7 +25,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token', 'confirmation_token',
     ];
 
     protected $casts = [
@@ -37,13 +37,13 @@ class User extends Authenticatable
     {
         parent::boot();
 
-        static::deleting(function ($song) {
+        static::deleting(function ($user) {
 
         });
 
-        static::created(function ($song) {
-            $song->slug = $song->name;
-            $song->save();
+        static::created(function ($user) {
+            $user->slug = $user->username;
+            $user->save();
         });
 
     }
@@ -75,7 +75,6 @@ class User extends Authenticatable
         return $value
             ? 'http://www.kasivibe.com/uploads/users/avatar/' . $value
             : 'https://www.gravatar.com/avatar/' . strtolower( trim(md5($this->attributes['email'])))
-
             . '?s=300&d=wavatar';
             //: 'https://www.kasivibe.com/img/no-avatar.png'
 

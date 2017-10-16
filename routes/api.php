@@ -50,7 +50,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('songs/upload', 'SongController@uploadFile')
         ->middleware('auth.jwt')
         ->middleware('must-be-confirmed');
-    Route::post('/songs', 'SongController@create')
+    Route::post('/songs', 'SongController@store')
         ->middleware('auth.jwt');
     Route::get('/songs/{slug}', 'SongController@show');
     Route::patch('/songs/{id}', [
@@ -94,15 +94,18 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/albums', [
         'uses' => 'AlbumController@index'
     ]);
-    Route::get('/albums/{id}', [
-        'uses' => 'AlbumController@show'
-    ]);
+    Route::get('/albums/{id}',  'AlbumController@show');
+    Route::post('/albums', 'AlbumController@store')
+        ->middleware('auth.jwt');
+    Route::patch('/albums/{slug}', 'AlbumController@update')
+        ->middleware('auth.jwt');
+    Route::delete('/albums/{slug}', 'AlbumController@destroy')
+        ->middleware('auth.jwt');
 
     Route::get('/notifications', [
         'uses' => 'NotificationsController@index',
         'middleware' => 'auth.jwt',
     ]);
-
     Route::get('/notifications/{id}/read', [
         'uses' => 'NotificationsController@markAsRead',
         'middleware' => 'auth.jwt',
