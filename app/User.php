@@ -2,7 +2,8 @@
 
 namespace App;
 
-use Froiden\RestAPI\ApiModel;
+use App\Models\Album;
+use App\Models\Song;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -30,6 +31,10 @@ class User extends Authenticatable
 
     protected $casts = [
         'confirmed' => 'boolean'
+    ];
+
+    protected $appends = [
+        'songs_count', 'albums_count'
     ];
 
 
@@ -83,6 +88,18 @@ class User extends Authenticatable
     public function getArtistNameAttribute($value)
     {
         return $value ?: $this->username;
+    }
+
+    // @todo: Check if count is correct
+    public function getSongsCountAttribute()
+    {
+        return $this->songs()->whereActive('1')->wherePrivate('0')->count();
+    }
+
+    // @todo: Check if count is correct
+    public function getAlbumsCountAttribute()
+    {
+        return $this->albums()->whereActive('1')->count();
     }
 
 

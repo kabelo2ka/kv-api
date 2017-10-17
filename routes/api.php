@@ -38,6 +38,11 @@ Route::group(['prefix' => 'v1'], function () {
         return \App\User::whereUsername('kabelo')->get();
     });
 
+    Route::get('/user/songs', [
+        'uses' => 'SongController@authSongs',
+        'middleware' => 'auth.jwt'
+    ]);
+
     Route::get('/user/albums', [
         'uses' => 'AlbumController@authAlbums',
         'middleware' => 'auth.jwt'
@@ -53,10 +58,11 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/songs', 'SongController@store')
         ->middleware('auth.jwt');
     Route::get('/songs/{slug}', 'SongController@show');
-    Route::patch('/songs/{id}', [
-        'uses' => 'SongController@update',
-        'middleware' => 'auth.jwt'
-    ]);
+    Route::delete('/songs/{slug}', 'SongController@destroy')
+        ->middleware('auth.jwt');
+    Route::patch('/songs/{id}', 'SongController@update')
+        ->middleware('auth.jwt');
+
     Route::get('songs/{id}/stream', 'SongController@stream');
     Route::get('songs/{id}/download', 'SongController@download');
     Route::post('song/like', [

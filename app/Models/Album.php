@@ -18,6 +18,10 @@ class Album extends Model
         'image' => self::DEFAULT_ART,
     );
 
+    protected $appends = array(
+        'is_admin',
+    );
+
     public static function boot()
     {
         parent::boot();
@@ -78,5 +82,16 @@ class Album extends Model
             return 0;
         }
         return $value;
+    }
+
+    public function getIsAdminAttribute()
+    {
+        try {
+            if ($user = \JWTAuth::parseToken()->authenticate()) {
+                return $this->user_id == $user->id;
+            }
+        } catch (\Exception $e) {
+        }
+        return false;
     }
 }

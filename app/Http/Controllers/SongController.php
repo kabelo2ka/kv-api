@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Redis;
 use JWTAuth;
 use Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+
 
 class SongController extends Controller
 {
@@ -25,9 +25,10 @@ class SongController extends Controller
         return response(array('data' => $songs), 200);
     }
 
-    public function delete($id)
+    public function destroy($slug)
     {
-        if ($song = Auth::user()->songs()->whereId($id)->delete()) {
+        if ($song = Auth::user()->songs()->whereSlug($slug)->firstOrFail()) {
+            $song->delete();
             return response()->json(['msg' => 'success'], 200);
         }
         return response(404);
@@ -147,25 +148,17 @@ class SongController extends Controller
 
     public function stream($id)
     {
-        //$filename = base_path('resources/audio/' . $id . '.mp3');
         $song = Song::findOrFail($id);
         $filename = public_path('uploads/songs/' . $song->file_name);
+
         if (file_exists($filename)) {
-            $filesize = (int)File::size($filename);
-            $file = File::get($filename);
-            $mime_type = 'audio/mpeg, audio/x-mpeg, audio/x-mpeg-3, audio/mpeg3';
-            $response = Response::make($file, 200);
-            $response->header('Content-Type', 'audio/mpeg');
-            $response->header('Content-Length', $filesize);
-            $response->header('X-Pad', 'avoid browser bug');
-            //$response->header('Content-Disposition', 'filename="' . $song->file_name . '"');
-            $response->header('Cache-Control', 'no-cache');
-            $response->header('Accept-Ranges', 'bytes');
-            $response->header('Content-Range', 'bytes 0-' . $filesize . '/' . $filesize);
+            // Return audio stream
+            $response = new BinaryFileResponse($filename);
+            BinaryFileResponse::trustXSendfileTypeHeader();
             return $response;
-        } else {
-            return response()->json('File Not Found', 404);
         }
+
+        return response()->json(['error'=>'File Not Found'], 404);
     }
 
 

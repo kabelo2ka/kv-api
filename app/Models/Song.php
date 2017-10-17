@@ -16,7 +16,7 @@ class Song extends Model
      *
      * @var array
      */
-    protected $fillable = array('name', 'file_name', 'lyrics');
+    protected $fillable = array('name', 'file_name', 'lyrics', 'downloadable', 'commentable', 'private');
 
     protected $appends = array('is_liked', 'likes_count', 'comments_count', 'downloads_count', 'plays_count', 'download_link', 'is_admin', 'url', 'created_at_ago');
 
@@ -44,6 +44,15 @@ class Song extends Model
 
     }
 
+    public static function defaultAlbum()
+    {
+        return [
+            'id'    => 0,
+            'name'  => 'Miscellaneous',
+            'image' => 'http://www.kasivibe.com/img/no-art.png'
+        ];
+    }
+
     public function artists()
     {
         return $this->belongsToMany('App\Models\Artist');
@@ -64,25 +73,6 @@ class Song extends Model
         return $this->belongsTo('App\User');
     }
 
-    public function comments()
-    {
-        return $this->hasMany('App\Models\Comment');
-    }
-
-    public static function defaultAlbum()
-    {
-        return [
-            'id' => 0,
-            'name' => 'Miscellaneous',
-            'image' => 'http://www.kasivibe.com/img/no-art.png'
-        ];
-    }
-
-    public function likes()
-    {
-        return $this->morphToMany('\App\User', 'likeable');
-    }
-
     public function getIsLikedAttribute()
     {
         try {
@@ -93,6 +83,11 @@ class Song extends Model
         } catch (\Exception $e) {
         }
         return false;
+    }
+
+    public function likes()
+    {
+        return $this->morphToMany('\App\User', 'likeable');
     }
 
     public function getIsAdminAttribute()
@@ -108,7 +103,7 @@ class Song extends Model
 
     public function getUrlAttribute()
     {
-        //return 'http://www.kasivibe.com/uploads/songs/' . $this->file_name;
+        // return '//www.kasivibe.com/uploads/songs/' . $this->file_name;
         return '//kasivibe.com/api/v1/songs/' . $this->id . '/stream';
     }
 
@@ -125,6 +120,11 @@ class Song extends Model
     public function getCommentsCountAttribute()
     {
         return (int)$this->comments()->count();
+    }
+
+    public function comments()
+    {
+        return $this->hasMany('App\Models\Comment');
     }
 
     public function getPlaysCountAttribute()

@@ -70,4 +70,5 @@ class AlbumController extends Controller
         return response()->json(['data', 'Deleted'], 200);
     }
 
+
 }
