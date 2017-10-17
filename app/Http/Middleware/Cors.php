@@ -18,10 +18,10 @@ class Cors
 
         // only set headers if response is not audio
         if(strpos($response->headers->get('content-type'), 'audio') === false) {
-            $response->header('Access-Control-Allow-Origin', '*')
-                //->header('Access-Control-Max-Age', (60 * 60 * 24))
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+            header('Access-Control-Allow-Origin: *');
+            //->header('Access-Control-Max-Age', (60 * 60 * 24))
+            header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+            header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
         }
 
 

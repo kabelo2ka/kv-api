@@ -11,11 +11,8 @@
 |
 */
 
-Route::get('test', function () {
-    $comment = \App\Models\Comment::first();
-    $user = \App\User::first();
-    $user->notify(new \App\Notifications\UserCommented($comment));
-    return 'Sent';
+Route::get('server', function () {
+    // dd($_SERVER);
 });
 
 Route::get('php.info', function () {
