@@ -129,7 +129,7 @@ class Song extends Model
 
     public function getPlaysCountAttribute()
     {
-        return (int)Redis::get('songs:' . $this->id . ':plays') | 0;
+        return (int)count(Redis::keys('songs:' . $this->id . ':ip*:plays')) | 0;
     }
 
     public function getDownloadsCountAttribute()

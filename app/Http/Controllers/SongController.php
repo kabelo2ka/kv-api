@@ -201,12 +201,20 @@ class SongController extends Controller
 
     public function storePlay(Request $request)
     {
+        $song_id = $request->get('song_id');
+        $date = date('dmY');
+        $user_ip = $request->ip(); // For unique plays
+        $play_key = 'songs:' . $song_id . ':ip:' . $user_ip .':date:' . $date . ':plays';
+
+        // if there's a stored play
+        if ( Redis::get($play_key) ) {
+            return response()->json(['data' => 'already_recorded'], 208);
+        }
+
         // 1. Publish Event
         // 2. Node.js + Redis subscribes to the event
         // 3. Use socket.io to emit to all subscribed clients
-        //$user_ip = $request->ip(); // For unique plays
-        $song_id = $request->get('song_id');
-        Redis::incr('songs:' . $song_id . ':plays');
+        Redis::incr($play_key);
         event(new UserPlayedSong($song_id));
         return response()->json(['data' => 'success'], 200);
     }
