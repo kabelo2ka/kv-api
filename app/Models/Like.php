@@ -12,6 +12,8 @@ class Like extends Model
 
     protected $table = 'likeables';
 
+    protected $dates = ['deleted_at'];
+
     protected $fillable = [
         'user_id',
         'likeable_id',

@@ -9,6 +9,7 @@ class Cors
 {
     public function handle($request, Closure $next)
     {
+        // @todo: Check if it's safe to remove this conditional statement
         if ($request->isMethod('OPTIONS')) {
             $response = new Response("", 200);
         }
