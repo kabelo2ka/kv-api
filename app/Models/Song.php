@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Redis;
 use JWTAuth;
-
 
 class Song extends Model
 {
@@ -178,5 +178,39 @@ class Song extends Model
         return '//kasivibe.com/api/v1/songs/' . $this->id . '/download';
     }
 
+    /**
+     * Generate song key for Redis
+     *
+     * @param integer $song_id Song's ID
+     * @param string $user_ip User's IP Address for unique plays
+     * @return string
+     */
+    public static function getSongKey($song_id, $user_ip)
+    {
+        $date = date('dmY');
+        return 'songs:' . $song_id . ':ip:' . $user_ip .':date:' . $date . ':plays';
+    }
+
+    /**
+     * Get popular songs
+     * @param $limit
+     */
+    public static function getTrending($limit = 3)
+    {
+        $song_keys = Redis::keys('songs:*:plays');
+        $song_ids = [];
+        $limit = $limit | 3;
+        foreach ($song_keys as $key) {
+            preg_match('/[0-9]+/', $key, $matches);
+            $song_ids[] = (int)$matches[0];
+        }
+        $song_ids = array_count_values($song_ids);
+        arsort($song_ids);
+        $song_ids = array_keys($song_ids);
+        $songs = self::with('album', 'user')->whereIn('id', $song_ids)
+            ->orderByRaw(DB::raw("FIELD(id," . implode(',',$song_ids) .')' ))
+            ->take($limit)->get();
+        return $songs;
+    }
 
 }

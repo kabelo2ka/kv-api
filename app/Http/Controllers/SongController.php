@@ -25,6 +25,14 @@ class SongController extends Controller
         return response(array('data' => $songs), 200);
     }
 
+    public function trending(Request $request)
+    {
+        $limit = $request->get('limit');
+
+        $songs = Song::getTrending($limit);
+        return response()->json(['data'=>$songs], 200);
+    }
+
     public function destroy($slug)
     {
         if ($song = Auth::user()->songs()->whereSlug($slug)->firstOrFail()) {
@@ -157,7 +165,6 @@ class SongController extends Controller
             BinaryFileResponse::trustXSendfileTypeHeader();
             return $response;
         }
-
         return response()->json(['error'=>'File Not Found'], 404);
     }
 

@@ -79,6 +79,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::post('/songs/plays', 'SongController@storePlay');
     Route::get('/songs/{song}/plays', 'SongController@storePlay');
+    Route::get('/trending-songs', 'SongController@trending');
 
     Route::post('comment/like', [
         'as' => 'comment.like',
