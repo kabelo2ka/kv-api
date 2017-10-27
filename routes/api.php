@@ -18,6 +18,9 @@
 
 Route::group(['prefix' => 'v1'], function () {
 
+    Route::get('policies/terms', 'PolicyController@getTermsOfUse');
+    Route::get('policies/privacy', 'PolicyController@getPrivacyPolicy');
+
     Route::post('/user', [
         'uses' => 'UserController@signUp'
     ]);
