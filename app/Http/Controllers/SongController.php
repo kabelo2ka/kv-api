@@ -29,7 +29,6 @@ class SongController extends Controller
     public function trending(Request $request)
     {
         $limit = $request->get('limit');
-
         $songs = Song::getTrending($limit);
         return response()->json(['data'=>$songs], 200);
     }
