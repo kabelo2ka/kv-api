@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\UserPlayedSong;
 use App\Http\Requests\SongRequest;
 use App\Models\Song;
+use App\Notifications\SongPlayedMultipleTimes;
 use Auth;
 use DateTime;
 use File;
@@ -213,16 +214,22 @@ class SongController extends Controller
         $user_ip = $request->ip(); // For unique plays
         $play_key = 'songs:' . $song_id . ':ip:' . $user_ip .':date:' . $date . ':plays';
 
-        // if there's a stored play
-        if ( Redis::get($play_key) ) {
+        // if there's a stored play - User can only record a play once a day
+        /*if ( Redis::get($play_key) ) {
             return response()->json(['data' => 'already_recorded'], 208);
-        }
+        }*/
 
         // 1. Publish Event
         // 2. Node.js + Redis subscribes to the event
         // 3. Use socket.io to emit to all subscribed clients
         Redis::incr($play_key);
         event(new UserPlayedSong($song_id));
+
+        //Send notification to song owner
+        $song = Song::whereId($song_id)->firstOrFail();
+        $song_owner = $song->user;
+        $song_owner->notify(new SongPlayedMultipleTimes($song));
+
         return response()->json(['data' => 'success'], 200);
     }
 
