@@ -25,7 +25,7 @@ class Song extends Model
         parent::boot();
 
         static::deleting(function ($song) {
-            // @todo Research: Does soft delete fire this event? If yes, don't the song's related data.
+            // @todo Research: Does soft delete fire this event? If yes, don't delete the song's related data.
             /*// Delete audio file
             \File::delete(self::SONGS_DIR . $song->name);
             // Delete comments
@@ -185,7 +185,7 @@ class Song extends Model
      * @param string $user_ip User's IP Address for unique plays
      * @return string
      */
-    public static function getSongKey($song_id, $user_ip)
+    public static function getSongKey($song_id, $user_ip): string
     {
         $date = date('dmY');
         return 'songs:' . $song_id . ':ip:' . $user_ip .':date:' . $date . ':plays';
@@ -194,12 +194,13 @@ class Song extends Model
     /**
      * Get popular songs
      * @param $limit
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
     public static function getTrending($limit = 3)
     {
         $song_keys = Redis::keys('songs:*:plays');
         $song_ids = [];
-        $limit = $limit | 3;
+        $limit |= 3;
         foreach ($song_keys as $key) {
             preg_match('/[0-9]+/', $key, $matches);
             $song_ids[] = (int)$matches[0];
@@ -208,7 +209,7 @@ class Song extends Model
         arsort($song_ids);
         $song_ids = array_keys($song_ids);
         $songs = self::with('album', 'user')->whereIn('id', $song_ids)
-            ->orderByRaw(DB::raw("FIELD(id," . implode(',',$song_ids) .')' ))
+            ->orderByRaw(DB::raw('FIELD(id,' . implode(',',$song_ids) .')' ))
             ->take($limit)->get();
         return $songs;
     }

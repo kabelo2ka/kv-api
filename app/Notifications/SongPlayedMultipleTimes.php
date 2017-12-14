@@ -44,7 +44,7 @@ class SongPlayedMultipleTimes extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('Congrats, your song "'. $this->song->name .'" has been played '. $this->song->plays_count .' times.')
+                    ->line("Congrats, your song \" {$this->song->name} \" has been played  {$this->song->plays_count} ". str_plural('time', count($this->song->plays_count)).'.')
                     ->action('See song', url('http://kasivibe.com/app/songs/' . $this->song->slug))
                     ->line('Thank you for using Kasivibe!');
     }
