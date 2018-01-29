@@ -12,7 +12,7 @@
 */
 
 Route::get('server', function () {
-    // dd($_SERVER);
+    dd($_SERVER);
 });
 
 Route::get('php.info', function () {
@@ -43,8 +43,9 @@ Route::get('test', function () {
     }
 
     if ($cover !== null) {
-        $cover='data:'.$ThisFileInfo['comments']['picture'][0]['image_mime'].';charset=utf-8;base64,'.base64_encode($ThisFileInfo['comments']['picture'][0]['data']);
-        echo '<img src="'. @$cover.'"/>'; exit();
+        $cover = 'data:' . $ThisFileInfo['comments']['picture'][0]['image_mime'] . ';charset=utf-8;base64,' . base64_encode($ThisFileInfo['comments']['picture'][0]['data']);
+        echo '<img src="' . @$cover . '"/>';
+        exit();
 
         // Send file
         header("Content-Type: " . $mimetype);
@@ -56,7 +57,7 @@ Route::get('test', function () {
         echo($cover);
     }
 
-    });
+});
 
 
 Route::get('tes2', function () {
@@ -67,12 +68,12 @@ Route::get('tes2', function () {
 
 });
 
-    Route::get('/register/confirm', 'Auth\RegisterConfirmationController@index')->name('register.confirm-email');
+Route::get('/register/confirm', 'Auth\RegisterConfirmationController@index')->name('register.confirm-email');
 
-    Route::get('{all?}', function () {
-        ob_start();
-        require(public_path('app/index.html'));
-        return ob_get_clean();
-    })->where('all', '.+');
+Route::get('{all?}', function () {
+    ob_start();
+    require(public_path('app/index.html'));
+    return ob_get_clean();
+})->where('all', '.+');
 
 

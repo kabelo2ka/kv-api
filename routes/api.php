@@ -40,6 +40,9 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/users', function () {
         return \App\User::whereUsername('kabelo')->get();
     });
+    // Resend confirmation email to user
+    Route::get('/register/confirm/send', 'Auth\RegisterConfirmationController@resend')
+        ->middleware('auth.jwt');
 
     Route::get('/user/songs', [
         'uses' => 'SongController@authSongs',

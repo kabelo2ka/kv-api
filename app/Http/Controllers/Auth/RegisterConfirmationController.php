@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Auth\Events\Registered;
 use App\User;
-use Illuminate\Http\Request;
+use Auth;
+
 
 class RegisterConfirmationController extends Controller
 {
@@ -18,5 +20,15 @@ class RegisterConfirmationController extends Controller
         $user->confirmation_token = null;
         $user->save();
         return redirect('/')->with(['msg' => 'email_confirmed']);
+    }
+
+    public function resend()
+    {
+        $user = Auth::user();
+        event(new Registered($user));
+        return response()->json([
+            'user' => $user,
+            'message' => 'SUCCESS'
+        ]);
     }
 }
